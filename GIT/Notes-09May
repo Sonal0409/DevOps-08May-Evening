@@ -1,0 +1,121 @@
+1. Become root user:
+
+# sudo su -
+
+Create a Local repository using GIT
+
+#  mkdir myproject
+
+# cd myproject
+
+# touch index1.html index2.html
+
+# ls
+
+# git init
+
+A local repository will be created
+
+# ls -al
+
+.git folder will be available, which is your local repository.
+
+
+4. Add the configuration parameters in git, which will later update author and email details in the git commit history
+
+2 variables need to be set
+
+user.name
+user.email
+
+
+# git config --global user.name sonal0409
+
+# git config --global user.email admin@gmail.com
+
+List the configurations:
+
+git config --list
+
+try it latter
+==========================
+git config --global --unset user.name
+
+git config --global --unset user.email
+
+
+
+5. Add the files to the stagging area and commit them to Local repo
+=========================================
+
+# git status
+
+# git add <filename> <filename2>
+
+or
+
+git add --all
+
+or
+
+git add .
+
+or
+
+git add *.java *.php
+
+# git status
+
+# git commit -m "adding file index1.html"
+
+Commit all the changes/files in the stagging area
+
+If we want to Choose a file to be commited
+
+git commit -m "adding file index1.html" <filename>
+
+================================================
+
+6. Modify exisitng files and add those changes to local repo
+====================================================
+
+Take a file which is in local repo
+
+# git ls-files
+
+# vim index1.html
+
+add any data & save the file
+
+# git status
+
+status of file is modified
+
+To add all the modification and commit them to local repo
+
+# git commit -a -m "added modifications"
+
+
+7. If some files are not required to be tracked by GIT --> ignore certain files for version control
+
+=================================================
+Git provides the concept of gitignore, where in we create a file with the name .gitignore
+And we will add names of the files that we dont want to track
+This concept is applicable to files which are new and untracked
+
+# vim .gitignore
+
+In this file insert the name of files to be ingores
+
+press i
+
+*.txt
+*.php
+*.state
+
+:wq
+
+# git status
+
+This concept this applicable to new file(files that are not commited)
+It is only for untracked file.
