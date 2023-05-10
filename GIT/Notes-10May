@@ -1,0 +1,128 @@
+If some files are not required to be tracked by GIT --> ignore certain files for version control
+
+=================================================
+
+Git provides the concept of .gitignore, where in we create a file with the name .gitignore
+And we will add names of the files that we dont want to track
+This concept is applicable to files which are new and untracked
+
+# vim .gitignore
+
+In this file insert the name of files to be ingores
+
+press i
+
+*.xml
+*.php
+*.log
+
+:wq
+
+# git status
+
+This concept this applicable to new file(files that are not commited)
+It is only for untracked file.
+
+
+8. How can GIT  ignore changes on tracked files for certian time.
+
+GIT STASHING
+
+============================================
+
+If we have some incomplete work on tracked files, we can stash them in a temporary location and latter we can get them back to working directory
+
+vim index1.html
+
+press i
+
+inster some new data
+
+press esc key
+:wq   and then enter key
+
+# git status ==> you will see modiffied file
+
+# git diff index1.html
+
+Stash the modifications
+
+# git stash
+
+you can see the stash in .git==>refs==>stash folder
+
+# git stash list
+
+stash is saved a n array of index
+
+stash name stash@{0}
+
+see what saved in the stash 
+
+# git show stash@{0}
+
+================================================
+
+19-Apr Notes
+================================================
+
+# sudo su -
+
+# cd myproject
+
+1. Check the log for commit history
+
+# git log
+
+in this HEAD it is an object in git which represents the latest/recent commit id
+
+# git log --oneline
+
+Check commit history of every commit in a single line
+
+# git show <commid id>
+Shows what happened in that commit.
+
+See commits of a particular file:
+
+ git log --graph --all -- index1.html
+
+
+2. Create a feature branch in git  and switch to the branch
+
+========================================
+
+# git branch
+
+Create a new branch
+
+# git branch feature1
+
+Switch to the new branch
+
+# git checkout feature1
+
+[OR]
+
+Create a new branch and switch to the branch also
+
+# git checkout -b feature2
+
+3. Merge the commits/files of new branch to master
+
+Before merging always switch to the destination branch
+
+# git checkout master
+
+# git merge feature1 master
+
+< git merge sourcebranch destinationbranch>
+
+
+4. Delete a branch which is not merged with master branch
+
+# git branch -D <branchname>
+
+Delete a branch whose commits have been merged with the master branch
+
+# git branch -d feature1
