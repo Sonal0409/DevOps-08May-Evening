@@ -86,9 +86,101 @@ Shows what happened in that commit.
 See commits of a particular file:
 
  git log --graph --all -- index1.html
+ 
+ =======================================================
+ 
+ ********************************************************
+Scenario6: Deletion of file
+
+- Deletion of file from WD & local repo
+
+# git rm file1
+# git status
+# git commit -m "deletion of file1"
+# ls
+# git ls-files
+
+- Deletion of file local repo only
+
+# git rm --cached file2
+# git commit -m "deteled file from local"
+# git status    // file will be untracked
+# ls
+# git ls-files
+
+# add the untracked file to local repo
 
 
-2. Create a feature branch in git  and switch to the branch
+*****************************************
+
+If chnages are in stagging area and you have to work on them again--you need to rewrite the code
+
+We need to unstage the changes, so as to write code again
+
+$ git reset HEAD filename
+
+OR
+
+$ git restore --staged <file>
+
+all chnages form stagging area==> move back to working directory(unstagged)
+
+***************************************
+ to discard changes in working directory
+if changes of an existing file(tracked by git)  are to be removed
+ie: remove the modifications from working directory using a git command
+
+$ git checkout -- index2.html
+
+OR 
+
+$ git restore <file>.
+
+
+permanently delete the changes
+
+******************************************
+
+Reverting the changes:
+
+# vim file3  // create a new files
+# git add file3
+# git commit -m "added file3"
+
+//Delete the file
+
+# git rm file3
+# git commit -m "deleted file3"
+# ls
+# git ls-files
+
+# git log --oneline    // last commit id is of delete action, copy it
+// lets revert the commit
+
+# git revert commit id
+
+// file back to WD and local
+# ls
+# git ls-files
+
+
+*******************************************************************
+
+
+git reset command:
+
+commes with 3 options:
+
+ git reset --hard <commitid>: will delete commit ids and will delete changes form WD, stagging, LR
+ git reset --soft <commitid>: will delete commit ids and changes will be back to stagging area
+ git reset --mixed <commitid> : will delete commit ids and changes will be back to working directory
+
+ > reset dowsnot generate a new commit id, so no new editor will be opened
+ 
+***********************************************************
+
+
+Create a feature branch in git  and switch to the branch
 
 ========================================
 
