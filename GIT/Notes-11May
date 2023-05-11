@@ -1,0 +1,191 @@
+Create a feature branch in git  and switch to the branch
+
+========================================
+
+# git branch
+
+Create a new branch
+
+# git branch feature1
+
+Switch to the new branch
+
+# git checkout feature1
+
+[OR]
+
+Create a new branch and switch to the branch also
+
+# git checkout -b feature2
+
+3. Merge the commits/files of new branch to master
+
+Before merging always switch to the destination branch
+
+# git checkout master
+
+# git merge feature1 master
+
+< git merge sourcebranch destinationbranch>
+
+
+Check which branches are merged to master
+
+git branch -a --merged master
+
+Check which branches are not merged to master
+
+git branch -a --no-merged master
+
+
+4. Delete a branch which is not merged with master branch
+
+# git branch -D <branchname>
+
+Delete a branch whose commits have been merged with the master branch
+
+# git branch -d feature1
+
+
+5. Reset the commit history
+
+# git reset --hard <commitid>
+
+here:
+
+commit id is where the HEAD will point to now.
+
+All the other commits above it will be deleted and the chnages will also be deleted from LR and working directory.
+
+It is a destructive command
+
+
+6. Rebase merging strategy in GIT (rewind the commit history)
+
+# git branch
+
+you should be on the master branch
+
+Now create a new branch
+
+# git branch feature1
+
+On the master branch create 2  new commits
+
+example of my log on master branch
+
+8bce083 (HEAD -> master) on master branch 2
+daa1204 on master branch1
+ea61e8e (feature1) added modifications
+0a733ed adding file index1.html
+
+
+Now switch to feature branch and create 2 new commits
+
+
+example of my log on master branch
+
+9981946 (HEAD -> feature1) on branch
+156dc12 done in feature branch
+ea61e8e added modifications
+0a733ed adding file index1.html
+
+
+I want to rebase - re organise the base of my feature branch
+
+Make sure you are on feature branch
+
+# git rebase master
+
+
+The commit history will be as such:
+
+41f5d79 (HEAD -> feature1) on branch
+9469e15 done in feature branch
+8bce083 (master) on master branch 2
+daa1204 on master branch1
+ea61e8e added modifications
+0a733ed adding file index1.html
+
+=================================================
+
+GITHUB:
+
+==================================================
+
+Login to github.com
+
+============================
+
+
+Personal access tokens (classic) function like ordinary OAuth access tokens. They can be used instead of a github password for Git over HTTPS, or can be used to authenticate to the API over Basic Authentication.
+
+1. Create a personal access token:
+
+ > clcik on user menu which is on the extreme right
+ > click on settings in that
+ > scroll down, on left side you will see developer settings -- click on it
+ > on left side 3 rd option --> personla Access token
+ > select tokens(classic)
+ > click on generate new token --> click on generate new token classic
+ > in note --give token name as token19
+ > expiration --> leave as is
+ > select scopes --> clcik on repo checkbox
+ > scroll down and clcik on generate token
+ > the generated token need to be copied safely
+
+Make sure to copy your personal access token now. You won’t be able to see it again!
+
+token:
+
+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 
+
+
+
+2. Create a remote repository
+
+3. Connect local repo to remote repo
+
+# git checkout master
+
+# git remote add origin https://github.com/Sonal0409/myproject19Apr.git
+
+# git remote -v 
+
+Remove origin if needed
+
+# git remote rm origin
+
+
+Push data from local to remote
+
+# git push origin master
+
+username : github
+password: token
+
+================================
+
+Create a file in github on master branch and pull the file to merge in local repoisotry master branch
+
+
+Once file is create don master branch of remote repo
+
+go to local repo
+
+# git checkout master
+
+# git pull origin master
+
+pull will fecth changes and merge them with LR and WD
+
+================================
+
+
+Clone a remote repository to local machine
+
+# git clone https://github.com/Sonal0409/myproject19Apr.git
+
+
+Forking - complete
+===========================================
