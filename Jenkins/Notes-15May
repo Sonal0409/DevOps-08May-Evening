@@ -1,0 +1,293 @@
+MAVEN : 
+=========================
+
+> It is a powerful tool which helps in building, managing and documenting your project
+
+> Maven by heart is a plugin based tool
+
+> whenever a maven plugin or command is executed, its output will be stored in folder called target
+
+> It has 2 types of plugins:
+
+Core Build plugins:
+
+Task  						Plugin					GOAL/Commands 	   output
+
+Compile the code  			Compiler				   mvn compile		    Java class files
+
+execute some Testcases		Surefire				   mvn test		        test passed/failed status
+
+Package the code			    package					mvn package         .war file
+
+Clean the previous build	    clean					    mvn clean		   clean up from target folder
+files
+
+install all dependencies	install					mvn install
+
+
+In maven multiple goals can be executed together
+
+# mvn clean install package
+
+
+Reporting plugins:
+==============================
+Will always generate reports, and in maven the reports are mostly generated in the format : xml,html,txt
+
+Task  						Plugin					GOAL/Commands 	output
+
+Code Review					pmd						mvn pmd:pmd		pmd.xml report	
+
+test reports				surefire				         mvn test		surefire reports - xml,txt
+
+Code coverage				JACOCO,sonarqube		mvn sonar:sonar
+
+
+
+Structure MAVEN project
+
+src/main/java   ==> source code will be present
+src/test/java   ==> test cases will be present
+
+pom.xml   ==> heart of maven project
+
+ 1. dependencies   ==> tools downloded by developer to write code
+ 2. plugin information
+ 3. Repositories ( local, central & remote)
+URls or location from ehre we have to download the plugin or dependency
+
+===============================================
+
+Demo 3: Jenkins + maven integration:
+
+Jenkins--> Manage Jenkins-->Global Tool configuration
+
+Under GIT==> leave it same 
+
+Under maven ==> lets install it automatically
+Type mymaven and check the install automatically box.
+Save the changes
+
+
+**********************************
+Job Package Job
+***************************
+
+Go to jenkins--> new item--> Name= Package==> freestyle project
+==> source codemanagement==>select git==> give git repo name https://github.com/Sonal0409/DevOpsClassCodes
+ 
+build ==> invoke top level maven target==>mymaven
+
+ goal = clean install package
+
+==> save==> build now
+==> click on build number and see the console
+
+==> go to workspace ==> target/addressbook.war
+
+==========================================================================
+
+pipelines Using plugins are called as Plugin based pipelines or Upstream and downstream pipelines
+These pipelines are created using freestyle jobs.
+
+Jenkins allows us to create multiple task in one single job.
+
+Whenever a user has to perfom set of tasks one after other (in a sequence) or in parallel, it can easily be done using 
+pipleine template in jenkins
+
+Pipleines in jenkins are nothing but set of task executed in sequence(by default) 
+
+When a user is creating a pipeline we will have to write code for it.
+The pipeline code is based on Groovy scripting which is Domain specific lanaguage
+In jenkins pipeline code using 2 types of syntax
+
+ > scripted pipeline syntax
+=======================================
+> scripted pipeline syntax always starts with a keyword called as node
+> When Jenkins version1 came in to the market, the admin used scripted pipeline syntax to write pipeline code
+> scripted pipeline syntax is difficult to read and write.
+> there is no structure or no definite style which writitng the code
+> The code written scripted pipeline syntax is not validated by jenkins
+> This syntax is no longer used
+> if the pipeline fails, you have to run the pipeline from the begining
+
+ > Declarative pipeline syntax
+========================================
+> Declarative pipeline syntax always starts with a keyword called as pipeline
+> With jenkins version2, Declarative pipeline syntax was introduced
+> This is well structured syntax, where user is provided with definite pipeline sections
+> we need to just declare the pipeline code
+> It declarative in nature, syntax is very simple
+> if the pipeline failes, you can restart the pipeline form the point that it had failed previously
+> Stages in pipeline means Job to be executed
+> Every stage will have a Name in the pipeline, steps to be executed, post build steps, 
+> jenkins provides a pipeline code snippet generator, that helps your to learn pipeline scripting very fast
+
+Syntax:  key 'value' 
+for example: name 'Jenkins'
+             sh 'echo "hello All"'
+
+Structure of Declarative pipeline syntax
+
+=========================================
+
+pipeline{
+
+  tools{
+		// declare names of tools that will while executing pipeline tasks
+}
+
+parameters{
+
+}
+agent {
+// this is mandatory
+// which server the pipleline will be executed
+}
+
+stages{
+  stage('job1'){
+	steps{
+		//clone a repo
+       }
+}
+stage('job2'){
+	steps{
+		sh 'mkdir myfiles'
+ 		sh 'cd myfiles'
+        sh 'mvn compile'
+       }
+}
+stage('job3'){
+	steps{
+		//clone a repo
+       }
+}
+
+}
+
+}
+
+==============================
+
+pipeline{
+    
+    tools{
+        maven 'mymaven'
+    }
+   // in agent any = any available server 
+    agent any
+   stages{
+       stage('Clone a Repo'){
+           steps{
+               git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+           }
+       }
+       
+       stage('Compile the code'){
+           steps{
+               sh 'mvn compile'
+           }
+       }
+       
+       stage('CodeReview'){
+           steps{
+               sh 'mvn pmd:pmd'
+           }
+       }
+       
+       stage('Unit Test'){
+           steps{
+               sh 'mvn test'
+           }
+       }
+       
+       stage('Package'){
+           steps{
+               sh 'mvn package'
+           }
+       }
+       }
+}
+
+
+
+
+Parallel stages
+
+pipeline{
+    
+    tools{
+        maven 'mymaven'
+    }
+
+    agent any
+
+   stages{
+       stage('Clone a Repo'){
+           steps{
+               git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+           }
+       }
+
+      stage('parallel stage') {
+
+      parallel {
+
+       	stage('Compile the code'){
+          	 steps{
+              	 sh 'mvn compile'
+          	 }
+      	 }
+       
+       stage('CodeReview'){
+           	steps{
+               sh 'mvn pmd:pmd'
+           }
+       }
+    }
+  }
+ }
+}
+======================================
+
+pipeline {
+    agent any
+    stages {
+        stage('job1') {
+            steps {
+                sh 'mkdir sonal'
+            }
+        }
+        stage('job2') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh "mkdir sonal"
+                }
+            }
+        }
+        stage('job3') {
+            steps {
+                sh 'touch myfile'
+            }
+        }
+    }
+}
+
+============================================================
+
+1. It is better that you write and maintain your pipeline code in Github, so that many team members can collaborate to the pipeline
+2. it allows version control the changes done on pipelines.
+
+3. How will jenkins read pipeline code from github?
+
+Jenkins uses the concept of Jenkinsfile
+
+It is a simple text file. it has no extention 
+Name is preffered as Jenkinsfile
+This is the file in which we will maintain pipeline code Version control
+
+
+Jenkins--> pipelinetemplate--> fetch jenkins file--> execute pipeline code for you.
+
+==========================================================
