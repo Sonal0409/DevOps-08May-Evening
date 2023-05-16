@@ -1,0 +1,44 @@
+Master and Agent Set up
+=============================================================
+
+Step 1: create a workder/agent node (VM of type linux) on AWS
+
+Step 2: Install git and java on worker node
+
+# yum install git -y
+# sudo amazon-linux-extras install java-openjdk11
+
+Step 3: Create remote root directory on the worker & give permissions for access  ==> /tmp/jenkinsdir
+
+cd /tmp
+
+mkdir jenkinsdir
+
+Give permission to remote root directory
+
+chmod -R 777 /tmp/jenkinsdir
+
+Step 4: Go to master machine and update Jenkins URL
+
+Manage Jenkins> Configure System > update the latest jenkins URL to the current url > save the page
+
+
+Step 5: On master machine open Agent port
+
+Manage Jenkins> Configure Global Security> scroll down to agents > select random and save the page
+
+Step 6: Configure worker/agent node on master
+
+Manage Jenkins> Manage nodes and clouds
+
+Number of executors= executor = Job ==> 1
+remote root directory : /tmp/jenkinsdir
+label : linux_node
+Usage: only build jobs with matching labels
+
+
+Step 7: check if connection is succesfull
+
+Step 8: add agent in the piepline
+
+=========================================================
