@@ -1,0 +1,156 @@
+=========================================================
+
+Continous Deployment with Docker
+=====================================================
+
+Install docker in AWS ec2 server
+
+# yum install docker -y
+
+Start docker service
+
+# systemctl start docker
+# systemctl status docker
+
+No need to install docker on lab server
+================================================
+
+
+
+Image Name:
+
+===============================
+
+Registryaddress/repository/Imagename:tagname
+
+docker pull tomcat:7
+
+docker pull dockerhub/library/tomcat:latest
+
+
+Pull images from DockerHub into dockerhost:
+======================================
+
+# docker pull ubuntu
+
+# docker pull ubuntu:18.04
+
+Remove an Image:
+
+# docker rmi ubuntu:18.04
+
+
+Run the image in dockerhost and launch a container
+
+========================================
+
+# docker run ubuntu
+
+Docker list all containers
+
+# docker ps -a
+
+
+
+
+Docker run command options
+===========================================
+
+Using docker command run an OS image -> launch a container--> container status should be up & running --> container should have a unique name
+=======================================
+
+Foreground Mode:(-it)
+=======================
+here : i=interactive , t=terminal
+
+Whenver we run docker command with foreground mode:
+
+ > A container will be created
+ > Container will be up & running
+ > user will be logged on to the container
+
+# docker run -it --name cont1 ubuntu
+
+You will be on the container.
+
+Comeout of the container --> keep the container running
+
+Execute CTL pq
+
+Comeout of the container -->  the container should be exited/Stopped
+
+execute  = > exit
+
+Go back into the container OR attach to the terminal of a running container again:
+
+# docker attach containername/id
+
+Restart a exited container:
+
+# docker start containername/id
+
+
+Delete a container:
+
+ docker rm -f cont1
+
+Delete Images and stopped containers:
+
+ docker system prune --all
+
+Using docker command run an webserver image -> launch a container--> container status should be up & running
+=======================================
+
+Detached Mode:(-d)
+=======================
+
+Whenver we run docker command with foreground mode:
+
+ > A container will be created
+ > Container will be up & running
+ > user will not be attached to the terminal of to the container
+
+# docker run --name n1 -d nginx
+
+===============================
+Attach to the terminal of the container from the host machine:
+============================
+
+# docker exec -it <containername> command
+
+# docker exec -it web /bin/bash
+
+
+
+Access app running on the Containers from browser of the machine
+
+
+Port Forwarding OR Port Mapping:
+===================================
+
+By default an application on docker container is avaibale on its exposed port.
+
+It is the users internet that cannot reach the container port
+
+For this we have do port forwarding or mapping in docker
+
+i.e. we have to map a EC2 free system port with container port
+
+example = 8989:80
+
+systemport:containerport
+
+> If a container is already created, we canot do port forwarding for the container
+
+> port forwarding will be applied at the docker run comamnd itself
+
+> flag for port forwarding (-p)
+
+# docker run --name web1 -d -p 8989:80 nginx
+
+
+> if you want docker to do port mapping then use flag -P
+
+# docker run --name web2 -d -P httpd
+
+=============================================
