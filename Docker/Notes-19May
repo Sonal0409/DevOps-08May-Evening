@@ -110,3 +110,9 @@ withCredentials([string(credentialsId: 'DOCKER_HUB_PASWD', variable: 'DOCKER_HUB
 
 Before executing the pipleine give jenkins permsision to run docker commands
  chmod 777 /var/run/docker.sock
+ 
+ Run the pipeline
+ 
+ Access the container from browser
+ 
+ ipaddress:portnumber/addressbook
