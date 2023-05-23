@@ -1,0 +1,72 @@
+Container Orchestration Tool --> Docker SWARM
+==================================================================================
+
+Orchestration tools --> works in Cluster mode
+
+Cluster --> 2-3 VM with docker installed on them
+
+SWARM cluster ==> multiple docker host with swarm intitiated in it
+
+1. How to create and set a swarm cluster
+
+Take VM1
+
+# docker swarm init
+
+Copy the token and paste on each worker node
+
+docker swarm join --token SWMTKN-1-6957zh43vwr1azic7tpm3gourojw1p367sp555ae5kghrk4pg5-bgtcc8892ddol39s8pb39jn18 172.31.46.73:2377
+
+
+Generate the token if needed
+
+docker swarm join-token worker
+
+# docker node ls
+
+
+2. Create multiple containers (replicas) of an Image and distribute them across the cluster
+
+SERVICE object 
+
+ # docker service create --name svc1 --replicas 4 -p 8282:80 nginx
+
+ # docker service ls
+ 
+ # docker service ps svc1
+
+3. HighAvailability feature of swarm
+
+# docker service ls
+
+# docker service ps svc1
+
+Delete any one the replicas
+
+docker rm -f <containerid>
+
+you will observe that immediatly a new replica has been created.
+
+
+4. Scale up and scale down the replica count for a service
+
+# docker service rm mySvc1
+
+# docker service scale mysvc=4
+
+# docker service scale mysvc=2
+
+Create Service with Volume
+
+docker service create --name myservice --mount type=volume,source=myvolume,target=/mypath --replicas 3 -p 8082:80 nginx
+
+5. Load balacing user requests 
+
+# docker service create --name mysvc --replicas 2 -p 8989:3000 sonal04/samplepyapp:v1
+
+# while true;do curl http://18.188.212.141:8989/;sleep 1;echo " ";done
+
+#  docker service scale mysvc=4
+# docker service ls
+# docker service update --image sonal04/samplepyapp:v2 mysvc
+# docker service rollback mysvc
