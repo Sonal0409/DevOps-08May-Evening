@@ -1,3 +1,21 @@
+
+Difference between Docker and Kubernetes
+=================================================
+> Docker is tool where we write docker file and build Custom Image
+> Provide Images in a Public or private registry
+> In docker creation of 1 container from 1 image:v1
+> Docker worked with single docker host
+
+Container Orchestration Tool -> Kubernetes
+
+> Creating multiple containers(replicas) from single image
+> Works in Cluster mode ( mulitple VMs where docker is installed)
+> Distributes the replicas to various VM thata re part of the cluster
+> Desire number of container are always maintained in kubernetes(High availabiltiy)
+> Scale up and scale down the containers (manually , autoScaling)
+> Rolling update Deployment
+> Kubernetes can orchestrate container of other CRI also- docker or CRI-O, containerD
+
 Kubernetes:
 ===================
 
