@@ -124,3 +124,27 @@ spec:
     command: ["bash","-c", "sleep 6000"]
 
 ============================================
+ReplicaSet YAML
+============================================
+
+kind: ReplicaSet
+apiVersion: apps/v1
+metadata:
+ name: myrs
+spec:
+ replicas: 3 # desired number of PODs
+ selector: # query to select pods with matching labels
+  matchLabels:
+   type: webserver
+ template: #heretemplate is Pod template,i.e.what should be on the POD,you are writing Pod details
+  metadata:
+   labels: # here labels is key and value given by user to group similar pods
+    type: webserver
+    app: java
+    author: sonal
+  spec: # this is pod specification
+   containers:
+    - name: c1
+      image: nginx
+
+
