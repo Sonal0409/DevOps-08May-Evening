@@ -1,0 +1,248 @@
+To manage a Kubernetes cluster and the applications running on it, 
+the kubectl binary or the Web UI are usually used. The kubectl tool call the API Server.
+
+When a request is sent to the API Server, it first needs to be authenticated (to make sure the requestor is known 
+by the system) before it’s authorized (to make sure the requestor is allowed to perform the action requested).
+
+The authentication step is done through the use of authentication plugins. There are several plugins as different authentication mechanisms can be used:
+
+Client certificates (the one we will talk about in this demo)
+Bearer tokens
+Authenticating proxy
+HTTP basic auth
+
+DEMO:
+============
+Lets say we have just set up a brand new Kubernetes cluster.
+It will be used across multiple teams and we already have a team member, Dave from the development team, 
+who wants to start deploying and testing his new microservices application on it.
+
+What are the High level steps we can do to get him access?  
+
+1. We will start by creating a namespace named development dedicated to the development team
+
+2. Dave needs to deploy standard Kubernetes resources like pods, deployments and services. 
+He will then be provided the right to create, list, update, get and delete Deployments and Services resources only. 
+Additional rights could be provided later on if needed. 
+We will ensure those rights are limited to the development namespace.
+
+3. As a pre-requiste Dave needs to have kubectl installed on his server, and he also needs openssl as 
+he will generate a private key and a certificate sign-in request.
+
+create a new Ubuntu Server and execute below steps:
+
+## Install Docker
+
+sudo wget https://raw.githubusercontent.com/lerndevops/labs/master/scripts/installDocker.sh -P /tmp
+sudo chmod 755 /tmp/installDocker.sh
+sudo bash /tmp/installDocker.sh
+sudo systemctl restart docker
+
+## Install kubeadm,kubelet,kubectl
+
+sudo wget https://raw.githubusercontent.com/lerndevops/labs/master/scripts/installK8S-v1-23.sh -P /tmp
+sudo chmod 755 /tmp/installK8S-v1-23.sh
+sudo bash /tmp/installK8S-v1-23.sh
+
+   71  docker -v
+   72  kubeadm version -o short
+   73  kubelet --version
+   74  kubectl version --short --client
+
+===============================================================
+Lets us start the demo and create a user Dave, gives access to kubernetes cluster :
+
+This is all part of Authentication .
+
+We will use the method of authentication as : X509 Client Certs -> Client certificate authentication
+
+On the main Kubernetes Master:
+
+1. Create a namespace by using the following command:
+
+# kubectl create namespace dev
+
+2. Create a directory dev
+
+mkdir dev
+cd dev
+
+3. Generating an RSA private key and certificate requests for Dave
+
+First we need to generate a private rsa key and a CSR. The private key can easily be created with this command:
+
+# sudo openssl genrsa -out dave.key 2048
+
+4. Use the following command to generate certificate requests:
+
+# sudo openssl req -new -key dave.key -out dave.csr
+
+Common Name (CN) field: this will be used to identify him against the API Server ==> dave
+Uses the group name in the Organisation (O) field: this will be used to identify the group against the API Server ==> dev
+
+5. Once the .csr file is created, Dave needs to send it to us (admins) so we can sign it using the cluster Certificate Authority. 
+
+Run the following command to link an identity to a private key using a digital signature.
+
+# sudo openssl x509 -req -in dave.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out dave.crt -days 500
+
+6. The following openssl command shows the certificate has been signed by the Kubernetes cluster CA (Issuer part), 
+the subject contains dave in the CN (CommonName) field and dev in the O (Organisation) field as Dave specified when creating the .csr file.
+
+# openssl x509 -in ./dave.crt -noout -text | less
+
+========================================
+7. Building a Kube Config for Dave
+
+
+Setting credentials to the user
+
+Set credentials to dave:
+
+# kubectl config set-credentials dave --client-certificate=/root/dev/dave.crt --client-key=/root/dev/dave.key
+
+Set context to dave:
+
+# kubectl config set-context dave-context --cluster=kubernetes --namespace=dev --user=dave
+
+Run the following command to display current contexts:
+
+# kubectl config get-contexts
+
+Everything is set up. 
+We now have to send Dave the information he needs to configure his local kubectl client to communicate with our cluster.
+
+=======================================
+
+
+Copy the config file from the master node in the home directory to the new node(dave).
+
+On master Machine
+
+cd ..
+
+cat .kube/config
+
+
+Paste the copied config file into the client machine in root directory iteself.
+
+vi myconf
+
+copy the master config file contents to this file
+
+In the Dave's node
+
+create a directory with name as dev
+
+mkdir dev
+
+cd dev
+
+Copy the crt and key files from the master node to the dave's node in the /role directory.
+
+keep the filename same as on master node
+
+vim dave.crt
+
+vim dave.key
+
+
+
+Locate the home directory.
+cd ..
+
+kubectl get pods --kubeconfig=myconf
+
+kubectl config get-contexts
+
+kubectl config use-context dev-user-context
+
+===================================================
+
+By creating a certificate, we allow Dave to authenticate against the API Server, but we did not specify any rights so he will not be able to do many things
+We will change that and give him the rights to create, get, update, list and delete Deployment and Service resources in the dev namespace.
+
+In a nutshell: A Role (the same applies to a ClusterRole) contains a list of rules. Each rule defines some actions that can be performed (eg: list, get, watch, …) against a list of resources (eg: Pod, Service, Secret) within apiGroups (eg: core, apps/v1, …). 
+While a Role defines rights for a specific namespace, the scope of a ClusterRole is the entire cluster.
+
+8. Creation of a Role
+Let’s first create a Role resource with the following specification:
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:       
+   namespace: dev
+   name: dave-role    
+rules:
+- apiGroups: ["", "extensions", "apps"]    
+  resources: ["deployments", "pods", "services"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+kubectl create -f role.yml
+
+kubectl get roles -n dev
+
+For your information:
+==================
+Pods and Services resources belongs to the core API group (value of the apiGroups key is the empty string), whereas Deployments resources belongs to the apps API group. 
+For those 2 apiGroups, we defined the list of resources and the actions that should be authorized on those ones.
+
+9. Creation of a RoleBinding
+The purpose of a RoleBinding is to link a Role (list of authorized actions) and a user or a group. 
+In order for Dave to have the rights specified in the above Role, we need to bind him to this Role. 
+We will use the following RoleBinding resource for this purpose:
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: role-dave
+ namespace: dev
+subjects:
+- kind: User
+  name: dave
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: dave-role
+  apiGroup: ""
+
+kubectl create -f rolebinding.yml
+
+kubectl get rolebinding -n dev
+
+
+This RoleBinding links:
+
+A subject: our user Dave.
+A role: the one named dev that allows to create/get/update/list/delete the Deployment and Service resources that we defined above.
+
+For your information:
+=============================
+as Dave belongs to the dev group, we could use the following RoleBinding in order to bind the previous Role with the group instead of with an individual user. Remember: the group information is provided in the Organisation (O) field within the certificate that is sent with each request.
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: dev
+ namespace: development
+subjects:
+- kind: Group
+  name: dev
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+ kind: Role
+ name: dev
+ apiGroup: rbac.authorization.k8s.io
+
+
+
+Run the following commands to verify roles we have generated:
+kubectl get pods --kubeconfig=myconf
+
+kubectl create deployment test --image=docker.io/httpd -n role --kubeconfig=myconf
+
+kubectl get pods --kubeconfig=myconf
+
+kubectl get deployment --kubeconfig=myconf
+
+The worker node can create, update, remove, and list pods, services, and deployments after using the master config settings.
