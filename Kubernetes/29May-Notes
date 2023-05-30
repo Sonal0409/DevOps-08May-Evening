@@ -1,0 +1,119 @@
+Namespace:
+
+# kubectl get namespace
+
+default namespace: holds all your resources created in cluster
+
+Kube-system: Hold pods created for kubernetes components
+
+If there is no namespace:
+===========================
+
+Run this YAMl file to create a POD => pod will be create din default namespace
+
+kind: Pod
+# apiVersion defines which code schema that k8s will use to create the object
+apiVersion: v1
+metadata:
+ name: pod1 
+spec: # specify what is it that we want on the POD (containers)
+ containers:
+  - name: c1
+    image: nginx
+  - name: c2
+    image: tomcat
+  - name: c3
+    image: ubuntu
+    command: ["bash", "-c", "sleep 6000"]
+
+
+kubectl create -f pod-defintion.yml 
+
+kubectl describe pod pod1 | less  
+
+==> namespace is default
+
+kubectl delete pod --all 
+
+all pods from default namespace gets deleted.
+
+Solution:
+
+How to create a new namespace:
+
+===============================
+
+kubectl create namespace dev
+
+kubectl get namespace
+
+
+Create a pod in new namespace
+
+kind: Pod
+# apiVersion defines which code schema that k8s will use to create the object
+apiVersion: v1
+metadata:
+ name: pod1 
+ namespace: dev
+spec: # specify what is it that we want on the POD (containers)
+ containers:
+  - name: c1
+    image: nginx
+  - name: c2
+    image: tomcat
+  - name: c3
+    image: ubuntu
+    command: ["bash", "-c", "sleep 6000"]
+
+
+# kubectl create -f pod-defintion.yml
+
+# kubectl get pods -n dev
+
+# kubectl delete pods --all -n dev
+
+
+Namespace can be used for all the object that you have created so far : Pods, replicas, Deployment & service
+
+Namepsace is not used for PV or PVC as they are cluster level objects
+Pods from any namespace can access the volumes
+
+==============================================================
+
+Prometheous Demo:
+==============================================================
+
+Step1 : Install kubestate metrics server on kubernetes cluster
+
+in the k8s cluster:
+========================
+git clone https://github.com/Sonal0409/DevOps_ClassNotes.git
+cd DevOps_ClassNotes
+cd Kubernetese
+cd Monitoring
+cd kube_state_metrics/standard
+
+execute below command to run all the yaml files
+
+kubectl create -f .
+
+after this  ==>
+
+cd ../..
+
+ls
+
+kubectl create -f prometheous.yml
+
+kubectl get all -n monitoring
+
+Take the ip of VM and node port number and access prometheous pod
+
+Create grafana container on any VM with docker on it
+
+# docker run -d -P --name grafana grafana/grafana
+
+# docker ps -a
+
+Access the grafana dashboard by using ipaddress of vm and port number.
