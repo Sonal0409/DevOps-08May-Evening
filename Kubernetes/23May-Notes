@@ -1,0 +1,102 @@
+Difference between Docker and Kubernetes
+=================================================
+> Docker is tool where we write docker file and build Custom Image
+> Provide Images in a Public or private registry
+> In docker creation of 1 container from 1 image:v1
+> Docker worked with single docker host
+
+Container Orchestration Tool -> Kubernetes
+
+> Creating multiple containers(replicas) from single image
+> Works in Cluster mode ( mulitple VMs where docker is installed)
+> Distributes the replicas to various VM thata re part of the cluster
+> Desire number of container are always maintained in kubernetes(High availabiltiy)
+> Scale up and scale down the containers (manually , autoScaling)
+> Rolling update Deployment
+> Kubernetes can orchestrate container of other CRI also- docker or CRI-O, containerD
+
+Kubernetes:
+===================
+
+K8s code is written in YAML
+
+YAML syntax is very easy
+
+key: "value"
+
+spacing is important
+
+tool using YAML, will provide you the key or its key name
+User has to just give the values
+
+values can be signle value or list of values
+values can string, integer, decimal,date
+
+These files have an extension as YAMl or YML
+
+Example: storing single value
+
+---
+company: Edureka
+training: devops
+trainer: sonal mittal
+time: 7PM
+days: weekdpas
+...
+
+Example: storing multiple values in a key
+
+---
+company: Edureka
+trainings:
+  - devops
+  - aws
+  - gcp
+  - selenium
+trainers:
+  - Sonal
+  - Jaya
+  - MArc
+  - Jack
+
+example: store data as an object
+
+---
+company: Edureka
+trainings:
+  - devops
+  - aws
+  - gcp
+  - selenium
+trainers:
+  - Name: Sonal
+    phone: 979887345
+    emial: sdfsdf#dfgdfg
+  - Name: Jaya
+    phone: 3435345
+    email: 43535
+timings:
+ - weekdays:
+    days: mon-friday
+ - weekends:
+    morning: 7am
+    eveinign: 7am
+
+
+================================
+Create a pod in kubernetes:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+  labels:
+    author: sonal
+    env: dev
+    app: webserver
+spec:
+ containers:
+  - name: c1
+    image: nginx
+
+================================
