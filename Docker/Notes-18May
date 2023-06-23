@@ -1,0 +1,158 @@
+Port Forwarding OR Port Mapping:
+===================================
+
+By default an application on docker container is avaibale on its exposed port.
+
+It is the users internet that cannot reach the container port
+
+For this we have do port forwarding or mapping in docker
+
+i.e. we have to map a EC2 free system port with container port
+
+example = 8989:80
+
+systemport:containerport
+
+> If a container is already created, we canot do port forwarding for the container
+
+> port forwarding will be applied at the docker run comamnd itself
+
+> flag for port forwarding (-p)
+
+# docker run --name web1 -d -p 8989:80 nginx
+
+
+> if you want docker to do port mapping then use flag -P
+
+# docker run --name web2 -d -P httpd
+
+=============================================
+
+Docker Volumes:
+
+It is a concept in which we preserve the data of container in the volumes created on docker host
+
+Whenver a containe ris deleted, the data in the container is also lost. In order to overcome this problem, we have docker volumes
+
+Volumes needs to be mounted on the container directory. whatever is there in the container directory will be preserved on the volume directory
+
+Voluems ar eof 2 types:
+
+- named volume
+ in this volume a specific name is given to volume directory and volume is created in docker area (/var/lib/docker)
+
+- bind mount
+  in this volume the data of the container can be preserved in any directory of the host machine
+there is no name given to the volume
+
+Note that: you can use volume to place/copy files on the container directory also.
+
+Volume mapping has to be done, during container runtime.
+
+Named volumes
+
+1. Create a docker volume that will preserve the data of a container
+
+> Create a named volume
+
+# docker volume ls
+# docker volume create myvol
+
+> where is the volume created
+
+# docker volume inspect myvol
+
+/var/lib/docker/volumes/myvol/_data
+
+> mount the volume on the container directory
+
+ docker run -it --name cont1 -v myvol:/tmp ubuntu
+
+> preserve data from contaienr to volume
+
+create some files in container and come out of container
+
+> delete container.. data will be there in volume directory
+
+# docker rm -f cont1
+
+# cd /var/lib/docker/volumes/myvol/_data
+
+=============================================
+
+2. Place files from volume on to a container
+
+> go to volume directory, it will have some files
+
+> create a container and mount the volume
+
+docker run -it --name cont1 -v myvol:/tmp ubuntu
+
+> you will observe volume data is there on contaienr sdirectory
+
+
+try out latter
+
+
+create a volume and mount on a container1
+store some files on the volume
+create container2 mapping same volume
+make chnages int eh container directory, you wills ee chnages available on second cont also.
+
+==============================================
+
+Bind Mounts:
+===================
+
+In this case, data will be saved on any directory of host machine
+
+I have got source code for webapplication in github
+
+https://github.com/Sonal0409/ecomm.git
+
+we will clone the code in docker host in a directory
+
+we will mount the directory on a container with image httpd
+
+We will access the application on the container form browser of our machine
+==============================
+
+Dockerfile
+===================================
+
+FROM ubuntu
+RUN apt-get update
+RUN apt-get install nginx -y
+COPY index.html /var/www/html/
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+build dockerfile into an Image
+
+# docker build -t myimage01 .
+
+# docker images
+
+Push the image in docker hub
+==================================
+
+From host machine loginto dockerhub
+
+# docker login
+
+username of dockerhub:
+password
+
+Need to chnage name of the image and add repository name where it has to be pushed in docker hub
+
+docker tag oldimageName dockerhubaccountName/imagename
+
+# docker tag myimage01 sonal04/myimage01
+
+Push the image
+
+# docker push sonal04/myimage01
+
+
+
+=================================

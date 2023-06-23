@@ -1,0 +1,118 @@
+Dockerfile
+===================================
+
+FROM ubuntu
+RUN apt-get update
+RUN apt-get install nginx -y
+COPY index.html /var/www/html/
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+build dockerfile into an Image
+
+# docker build -t myimage01 .
+
+# docker images
+
+Push the image in docker hub
+==================================
+
+From host machine loginto dockerhub
+
+# docker login
+
+username of dockerhub:
+password
+
+Need to chnage name of the image and add repository name where it has to be pushed in docker hub
+
+docker tag oldimageName dockerhubaccountName/imagename
+
+# docker tag myimage01 sonal04/myimage01
+
+Push the image
+
+# docker push sonal04/myimage01
+
+
+
+=================================
+
+CI/Cd pipeline
+
+Code in github repo
+
+https://github.com/Sonal0409/DevOpsCodeDemo.git
+
+Build the code ==> maven ==> addressbook.war
+
+/var/lib/jenkins/workspace/CICDpipeline/target/addressbook.war
+
+build a docker file
+
+FROM tomcat:9
+COPY addressbook.war /usr/local/tomcat/webapps
+EXPOSE 8080
+CMD  ["catalina.sh", "run"]
+
+Chnage the name of image
+push to dockerhub
+===========================
+
+Create the following pipeline in jenkins
+
+pipeline{
+    tools{
+        maven 'mymaven'
+    }
+    agent any
+    stages{
+        stage('clone repo'){
+            steps{
+                git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+            }
+        }
+        stage('Build Code'){
+            steps{
+                sh 'mvn package'
+            }
+        }
+        
+        
+        stage('build Image'){
+          
+            steps{
+                sh 'cp /var/lib/jenkins/workspace/CICDpipeline/target/addressbook.war .'
+                sh 'docker build -t myaddressbook .'
+            }
+        }
+        
+        stage('push Image'){
+            steps{
+
+withCredentials([string(credentialsId: 'DOCKER_HUB_PASWD', variable: 'DOCKER_HUB_PASWD')]) {
+                sh 'docker login -u edu123 -p ${DOCKER_HUB_PASWD}'
+                }
+              
+                sh 'docker tag myaddressbook edu123/myaddressbook'
+                sh 'docker push edu123/myaddressbook'
+            }
+        }
+        
+        stage('Deploy container'){
+            steps{
+                sh 'docker run -d -P edu123/myaddressbook'
+            }
+        }
+    }
+}
+
+
+Before executing the pipleine give jenkins permsision to run docker commands
+ chmod 777 /var/run/docker.sock
+ 
+ Run the pipeline
+ 
+ Access the container from browser
+ 
+ ipaddress:portnumber/addressbook

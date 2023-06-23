@@ -1,0 +1,79 @@
+Project 1 Execution Sample steps:
+
+===========================
+
+Setup a server with ansible installed and jenkins installed ==> completed
+
+Step 2: Jenkins + Ansible Integration
+======================================
+
+Download ansible plugin in jenkins
+
+Setup configuration of ansible plugin in jenkins
+
+
+Step 3: Create  a git repo with playbook and inventory file
+
+Repo Name: https://github.com/Sonal0409/Devops_project1_demo.git
+
+Create:
+ > invetory file
+ > index.html file
+ > playbook.yml
+
+Step 4: Create jenkins & ansible pipeline
+
+pipeline{
+    agent any
+    stages{
+        stage('Clone the repo'){
+            steps{
+                git branch: 'main', url: 'https://github.com/Sonal0409/Devops_project1_demo.git'
+            }
+        }
+        
+        stage('Execute the playbook using Ansible'){
+            steps{
+                ansiblePlaybook credentialsId: 'ansiblehost', disableHostKeyChecking: true, installation: 'myansible', inventory: 'dev.inv', playbook: 'playbook1.yml'
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
